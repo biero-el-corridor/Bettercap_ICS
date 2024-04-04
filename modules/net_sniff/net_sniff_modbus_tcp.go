@@ -344,7 +344,8 @@ func get_stored_query(l *List, val string) []byte {
 
 	//	Note that the query cannot be analyze in the loop if it is empty
 	if val == "" {
-        return nil, errors.New("Empty query provided")
+		fmt.Println("Empty query provided")
+        return nil
     }
 
 	for curr != nil {
