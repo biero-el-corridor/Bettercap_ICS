@@ -4,10 +4,10 @@ PKG_NAME:=bettercap
 PKG_VERSION:=2.28
 PKG_RELEASE:=2
 
-GO_PKG:=github.com/bettercap/bettercap
+GO_PKG:=github.com/biero-el-corridor/Bettercap_ICS
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/bettercap/bettercap/tar.gz/v${PKG_VERSION}?
+PKG_SOURCE_URL:=https://codeload.github.com/biero-el-corridor/Bettercap_ICS/tar.gz/v${PKG_VERSION}?
 PKG_HASH:=5bde85117679c6ed8b5469a5271cdd5f7e541bd9187b8d0f26dee790c37e36e9
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 

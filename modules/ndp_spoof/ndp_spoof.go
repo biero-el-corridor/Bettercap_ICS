@@ -2,13 +2,13 @@ package ndp_spoof
 
 import (
 	"fmt"
-	"github.com/bettercap/bettercap/packets"
+	"github.com/biero-el-corridor/Bettercap_ICS/packets"
 	"github.com/evilsocket/islazy/str"
 	"net"
 	"sync"
 	"time"
 
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 )
 
 type NDPSpoofer struct {
@@ -153,7 +153,7 @@ func (mod *NDPSpoofer) Start() error {
 			if mod.prefix != "" {
 				mod.Debug("sending router advertisement for prefix %s(%d)", mod.prefix, mod.prefixLength)
 				err, ra := packets.ICMP6RouterAdvertisement(mod.Session.Interface.IPv6, mod.Session.Interface.HW,
-					mod.prefix,	uint8(mod.prefixLength))
+					mod.prefix, uint8(mod.prefixLength))
 				if err != nil {
 					mod.Error("error creating ra packet: %v", err)
 				} else if err = mod.Session.Queue.Send(ra); err != nil {

@@ -1,9 +1,10 @@
+//go:build !android
 // +build !android
 
 package network
 
 import (
-	"github.com/bettercap/bettercap/routing"
+	"github.com/biero-el-corridor/Bettercap_ICS/routing"
 )
 
 func FindGateway(iface *Endpoint) (*Endpoint, error) {

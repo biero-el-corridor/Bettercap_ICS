@@ -1,8 +1,9 @@
 package net_sniff
 
 import (
-	"github.com/bettercap/bettercap/log"
 	"time"
+
+	"github.com/biero-el-corridor/Bettercap_ICS/log"
 )
 
 type SnifferStats struct {

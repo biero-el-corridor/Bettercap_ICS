@@ -1,6 +1,6 @@
 # Prerequisites
 
-Please, before creating this issue make sure that you read the [README](https://github.com/bettercap/bettercap/blob/master/README.md), that you are running the [latest stable version](https://github.com/bettercap/bettercap/releases) and that you already searched [other issues](https://github.com/bettercap/bettercap/issues?q=is%3Aopen+is%3Aissue+label%3Abug) to see if your problem or request was already reported.
+Please, before creating this issue make sure that you read the [README](https://github.com/biero-el-corridor/Bettercap_ICS/blob/master/README.md), that you are running the [latest stable version](https://github.com/biero-el-corridor/Bettercap_ICS/releases) and that you already searched [other issues](https://github.com/biero-el-corridor/Bettercap_ICS/issues?q=is%3Aopen+is%3Aissue+label%3Abug) to see if your problem or request was already reported.
 
 ! PLEASE REMOVE THIS PART AND LEAVE ONLY THE FOLLOWING SECTIONS IN YOUR REPORT !
 ---

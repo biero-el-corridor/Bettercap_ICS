@@ -2,18 +2,18 @@ package net_recon
 
 import (
 	"fmt"
-	"github.com/bettercap/bettercap/modules/syn_scan"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/syn_scan"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/bettercap/bettercap/network"
-	"github.com/bettercap/bettercap/packets"
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
+	"github.com/biero-el-corridor/Bettercap_ICS/packets"
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/evilsocket/islazy/tui"
 	"github.com/evilsocket/islazy/str"
+	"github.com/evilsocket/islazy/tui"
 )
 
 const (

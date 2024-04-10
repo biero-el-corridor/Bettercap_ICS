@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bettercap/bettercap/caplets"
+	"github.com/biero-el-corridor/Bettercap_ICS/caplets"
 
 	"github.com/bettercap/readline"
 

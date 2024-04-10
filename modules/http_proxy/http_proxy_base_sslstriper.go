@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bettercap/bettercap/log"
-	"github.com/bettercap/bettercap/modules/dns_spoof"
-	"github.com/bettercap/bettercap/network"
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/log"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/dns_spoof"
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/elazarl/goproxy"
 	"github.com/google/gopacket"

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bettercap/bettercap/modules/net_recon"
-	"github.com/bettercap/bettercap/network"
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/net_recon"
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/dustin/go-humanize"
 

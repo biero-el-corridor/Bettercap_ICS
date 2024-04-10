@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bettercap/bettercap/caplets"
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/caplets"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/dustin/go-humanize"
 

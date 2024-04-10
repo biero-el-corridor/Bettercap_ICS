@@ -1,9 +1,9 @@
 package js
 
 import (
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
 	"math/rand"
 	"net"
-	"github.com/bettercap/bettercap/network"
 )
 
 type randomPackage struct {

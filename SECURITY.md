@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Feature updates and security fixes are streamlined only to the latest version, make sure to check [the release page](https://github.com/bettercap/bettercap/releases) periodically.
+Feature updates and security fixes are streamlined only to the latest version, make sure to check [the release page](https://github.com/biero-el-corridor/Bettercap_ICS/releases) periodically.
 
 ## Reporting a Vulnerability
 

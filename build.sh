@@ -41,7 +41,7 @@ build_linux_amd64() {
 build_linux_armv6l() {
     host_dep 'arc.local'
 
-    DIR=/home/pi/gocode/src/github.com/bettercap/bettercap
+    DIR=/home/pi/gocode/src/github.com/biero-el-corridor/Bettercap_ICS
 
     echo "@ Updating repo on arm6l host ..."
     ssh pi@arc.local "cd $DIR && rm -rf '$OUTPUT' && git checkout . && git checkout master && git pull" > /dev/null
@@ -55,7 +55,7 @@ build_linux_armv6l() {
 build_macos_amd64() {
     host_dep 'osxvm'
 
-    DIR=/Users/evilsocket/gocode/src/github.com/bettercap/bettercap
+    DIR=/Users/evilsocket/gocode/src/github.com/biero-el-corridor/Bettercap_ICS
 
     echo "@ Updating repo on MacOS VM ..."
     ssh osxvm "cd $DIR && rm -rf '$OUTPUT' && git checkout . && git checkout master && git pull" > /dev/null
@@ -69,7 +69,7 @@ build_macos_amd64() {
 build_windows_amd64() {
     host_dep 'winvm'
 
-    DIR=c:/Users/evilsocket/gopath/src/github.com/bettercap/bettercap
+    DIR=c:/Users/evilsocket/gopath/src/github.com/biero-el-corridor/Bettercap_ICS
 
     echo "@ Updating repo on Windows VM ..."
     ssh winvm "cd $DIR && git checkout . && git checkout master && git pull && go get ./..." > /dev/null
@@ -87,7 +87,7 @@ build_android_arm() {
     THEPATH="$BASE/usr/bin:$BASE/usr/bin/applets:/system/xbin:/system/bin"
     LPATH="$BASE/usr/lib"
     GPATH=$BASE/home/go
-    DIR=$GPATH/src/github.com/bettercap/bettercap
+    DIR=$GPATH/src/github.com/biero-el-corridor/Bettercap_ICS
 
     echo "@ Updating repo on Android host ..."
     ssh -p 8022 root@shield "su -c 'export PATH=$THEPATH && export LD_LIBRARY_PATH="$LPATH" && cd "$DIR" && rm -rf bettercap* && git pull && export GOPATH=$GPATH && go get ./...'"

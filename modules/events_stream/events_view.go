@@ -6,15 +6,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bettercap/bettercap/network"
-	"github.com/bettercap/bettercap/session"
-
-	"github.com/bettercap/bettercap/modules/net_sniff"
-	"github.com/bettercap/bettercap/modules/syn_scan"
-
-	"github.com/google/go-github/github"
+	//modbus_tcp "github.com/biero-el-corridor/Bettercap_ICS/modules/modbus"
+	
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/net_sniff"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/syn_scan"
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
+	
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/evilsocket/islazy/tui"
+	"github.com/google/go-github/github"
 )
 
 func (mod *EventsStream) viewLogEvent(output io.Writer, e session.Event) {
@@ -76,7 +77,9 @@ func (mod *EventsStream) viewModuleEvent(output io.Writer, e session.Event) {
 func (mod *EventsStream) viewSnifferEvent(output io.Writer, e session.Event) {
 	//mod.viewModbusTCPEvent(output, e)
 	if strings.HasPrefix(e.Tag, "net.sniff.http.") {
-		mod.viewModbusTCPEvent(output, e)
+		
+		mod.viewModbusTCPEvent(output,e)
+		//mod.viewModbusTCPEvent(output, e)
 		mod.viewHttpEvent(output, e)
 		
 	} else {

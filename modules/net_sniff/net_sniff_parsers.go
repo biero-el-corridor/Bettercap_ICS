@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/bettercap/bettercap/log"
-	"github.com/bettercap/bettercap/packets"
+	"github.com/biero-el-corridor/Bettercap_ICS/log"
+	"github.com/biero-el-corridor/Bettercap_ICS/packets"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"

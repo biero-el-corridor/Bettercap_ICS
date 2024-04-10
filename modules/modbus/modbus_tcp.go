@@ -1,12 +1,16 @@
 package modbus_tcp
 
+import (
+	"fmt"
+	//"github.com/biero-el-corridor/Bettercap_ICS/packets"
+)
+
 //"net"
 //"strings"
 
-//"github.com/evilsocket/islazy/str"
-//"github.com/google/gopacket"
-//"github.com/google/gopacket/layers"
-
+// "github.com/evilsocket/islazy/str"
+// "github.com/google/gopacket"
+// "github.com/google/gopacket/layers"
 type ModbusTCP struct {
 	TID    uint16 `json:"TID"`
 	PID    uint16 `json:"PID"`
@@ -26,7 +30,10 @@ func octalToDecimal(octal uint16) uint16 {
 	return decimal
 }
 
-//debug PoC funtions
+func PrintStuff() string {
+	fmt.Println("tets test ")
+	return "call functions inside the bettercap/packets/modbus.go file"
+}
 
 // get the byte array from the TCP payload sections from the net_sniff_modbus_tcp.go
 func (cmp *ModbusTCP) viewModbusTCPEvent(modbus []byte) ModbusTCP {

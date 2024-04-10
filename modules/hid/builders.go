@@ -1,7 +1,7 @@
 package hid
 
 import (
-	"github.com/bettercap/bettercap/network"
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
 )
 
 type FrameBuilder interface {

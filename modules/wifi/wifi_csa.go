@@ -3,10 +3,11 @@ package wifi
 import (
 	"bytes"
 	"fmt"
-	"github.com/bettercap/bettercap/network"
-	"github.com/bettercap/bettercap/packets"
-	"github.com/google/gopacket/layers"
 	"net"
+
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
+	"github.com/biero-el-corridor/Bettercap_ICS/packets"
+	"github.com/google/gopacket/layers"
 )
 
 func (mod *WiFiModule) isCSASilent() bool {

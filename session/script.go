@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bettercap/bettercap/caplets"
-	_ "github.com/bettercap/bettercap/js"
+	"github.com/biero-el-corridor/Bettercap_ICS/caplets"
+	_ "github.com/biero-el-corridor/Bettercap_ICS/js"
 
 	"github.com/evilsocket/islazy/fs"
 	"github.com/evilsocket/islazy/plugin"

@@ -1,38 +1,43 @@
 package modules
 
 import (
-	"github.com/bettercap/bettercap/modules/any_proxy"
-	"github.com/bettercap/bettercap/modules/api_rest"
-	"github.com/bettercap/bettercap/modules/arp_spoof"
-	"github.com/bettercap/bettercap/modules/ble"
-	"github.com/bettercap/bettercap/modules/c2"
-	"github.com/bettercap/bettercap/modules/caplets"
-	"github.com/bettercap/bettercap/modules/dhcp6_spoof"
-	"github.com/bettercap/bettercap/modules/dns_spoof"
-	"github.com/bettercap/bettercap/modules/events_stream"
-	"github.com/bettercap/bettercap/modules/gps"
-	"github.com/bettercap/bettercap/modules/hid"
-	"github.com/bettercap/bettercap/modules/http_proxy"
-	"github.com/bettercap/bettercap/modules/http_server"
-	"github.com/bettercap/bettercap/modules/https_proxy"
-	"github.com/bettercap/bettercap/modules/https_server"
-	"github.com/bettercap/bettercap/modules/mac_changer"
-	"github.com/bettercap/bettercap/modules/mdns_server"
-	"github.com/bettercap/bettercap/modules/mysql_server"
-	"github.com/bettercap/bettercap/modules/ndp_spoof"
-	"github.com/bettercap/bettercap/modules/net_probe"
-	"github.com/bettercap/bettercap/modules/net_recon"
-	"github.com/bettercap/bettercap/modules/net_sniff"
-	"github.com/bettercap/bettercap/modules/packet_proxy"
-	"github.com/bettercap/bettercap/modules/syn_scan"
-	"github.com/bettercap/bettercap/modules/tcp_proxy"
-	"github.com/bettercap/bettercap/modules/ticker"
-	"github.com/bettercap/bettercap/modules/ui"
-	"github.com/bettercap/bettercap/modules/update"
-	"github.com/bettercap/bettercap/modules/wifi"
-	"github.com/bettercap/bettercap/modules/wol"
+	// biero-el-corridor gepos
 
-	"github.com/bettercap/bettercap/session"
+	// bettercap official repos
+	//"github.com/biero-el-corridor/Bettercap_ICS/modules/modbus"
+
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/any_proxy"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/api_rest"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/arp_spoof"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/ble"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/c2"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/caplets"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/dhcp6_spoof"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/dns_spoof"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/events_stream"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/gps"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/hid"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/http_proxy"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/http_server"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/https_proxy"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/https_server"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/mac_changer"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/mdns_server"
+
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/mysql_server"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/ndp_spoof"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/net_probe"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/net_recon"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/net_sniff"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/packet_proxy"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/syn_scan"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/tcp_proxy"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/ticker"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/ui"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/update"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/wifi"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/wol"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 )
 
 func LoadModules(sess *session.Session) {
@@ -51,6 +56,7 @@ func LoadModules(sess *session.Session) {
 	sess.Register(https_server.NewHttpsServer(sess))
 	sess.Register(mac_changer.NewMacChanger(sess))
 	sess.Register(mysql_server.NewMySQLServer(sess))
+	
 	sess.Register(mdns_server.NewMDNSServer(sess))
 	sess.Register(net_sniff.NewSniffer(sess))
 	sess.Register(packet_proxy.NewPacketProxy(sess))

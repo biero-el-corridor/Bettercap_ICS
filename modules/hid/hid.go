@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bettercap/bettercap/modules/utils"
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/utils"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/bettercap/nrf24"
 )

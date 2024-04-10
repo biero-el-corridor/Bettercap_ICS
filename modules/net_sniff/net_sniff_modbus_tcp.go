@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/biero-el-corridor/Bettercap_ICS/packets"
+
 	"github.com/evilsocket/islazy/tui"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -14,139 +16,13 @@ import (
 	// get custom packet from the packet sections of bettercap
 )
 
-///////////////////////////////////////////////////
-// start of the packet/modbus.go sections /////////
-///////////////////////////////////////////////////
-
-// reference dissector from the wireshark project
-const (
-	// VALUE REPRESENTED AS DECIMAL
-	// VALUE OF THE FUNCTIONS CODE
-	READ_COILS                       = 1
-	READ_DISCRETE_INPUTS             = 2
-	READ_MULTIPLE_HOLDING_REGISTERS  = 3
-	READ_INPUT_REGISTERS             = 4
-	WRITE_SINGLE_COIL                = 5
-	WRITE_SINGLE_HOLDING_REGISTER    = 6
-	READ_EXCEPTION_STATUS            = 7
-	DIAGNOSTIC                       = 8
-	GET_COM_EVENT_COUNTER            = 11
-	GET_COM_EVENT_LOG                = 12
-	WRITE_MULTIPLE_COILS             = 15
-	WRITE_MULTIPLE_HOLDING_REGISTERS = 16
-	REPORT_SLAVE_ID                  = 17
-	READ_FILE_RECORD                 = 20
-	WRITE_FILE_RECORD                = 21
-	MASK_WRITE_REGISTER              = 22
-	READ_WRITE_MULTIPLE_REGISTERS    = 23
-	READ_FIFO_QUEUE                  = 24
-	READ_DEVICE_IDENTIFICATION       = 43
-	// ENCAPSULATED_INTERFACE_TRANSPORT = 43
-
-	//exeptions (error handeling) code for the modbus functions code
-	READ_COIL_EXEPTION           = 129 // exeptions error code for the read coil functions code
-	READ_DISCRETE_INPUTS_EXEPION = 130
-)
-
-// devcalre global variable
+// Declare global
 var list = &List{}
 var a = 0
 
-type ModbusTCP_struct struct {
-	TID    uint16 `json:"TID"`
-	PID    uint16 `json:"PID"`
-	Lenght uint16 `json:"Lenght"`
-	UID    uint8  `json:"UID"`
-}
-
-// //////////////////////
-// Funtions code 1 & 2 query and responce
-type Modbus_FUNCTIONS_CODE_1_OR_2_query struct {
-	FUNCTION_CODE    uint8  `json:"FUNCTION_CODE"`
-	REFERENCE_NUMBER uint16 `json:"REFERENCE_NUMBER"`
-	BITE_COUNT       uint16 `json:"BITE_COUNT"`
-}
-
-type Modbus_FUNCTIONS_CODE_1_OR_2_responce struct {
-	FUNCTION_CODE uint8           `json:"FUNCTION_CODE"`
-	BITE_COUNT    uint8           `json:"BITE_COUNT"`
-	DATA          map[uint16]byte `json:"WORD_COUNT"`
-}
-
-// //////////////////////
-// Funtions code 3 & 4
-type Modbus_FUNCTIONS_CODE_3_OR_4_query struct {
-	FUNCTION_CODE    uint8  `json:"FUNCTION_CODE"`
-	REFERENCE_NUMBER uint16 `json:"REFERENCE_NUMBER"`
-	WORD_COUNT       uint16 `json:"WORD_COUNT"`
-}
-
-type Modbus_FUNCTIONS_CODE_3_OR_4_responce struct {
-	FUNCTION_CODE uint8             `json:"FUNCTION_CODE"`
-	BYTE_COUNT    uint16            `json:"BITE_COUNT"`
-	DATA          map[uint16]uint16 `json:"WORD_COUNT"`
-}
-
-// //////////////////////
-// Funtions code 5 & 6
-// The two funtions have the same query structure.
-// SO there why there is no responce structure
-type Modbus_FUNCTIONS_CODE_5_OR_6_query struct {
-	FUNCTION_CODE    uint8  `json:"FUNCTION_CODE"`
-	REFERENCE_NUMBER uint16 `json:"REFERENCE_NUMBER"`
-	DATA             uint16 `json:"DATA"`
-}
-
-type Modbus_FUNCTIONS_CODE_15_query struct {
-	FUNCTION_CODE    uint8           `json:"FUNCTION_CODE"`
-	REFERENCE_NUMBER uint16          `json:"REFERENCE_NUMBER"`
-	BIT_COUNT        uint16          `json:"BIT_COUNT"`
-	BYTE_COUNT       uint8           `json:"BYTE_COUNT"`
-	BIT_DATA         map[uint16]byte `json:"DATA"`
-}
-
-// function code 16 not implemented yet
-type Modbus_FUNCTIONS_CODE_16_query struct {
-	FUNCTION_CODE    uint8             `json:"FUNCTION_CODE"`
-	REFERENCE_NUMBER uint16            `json:"REFERENCE_NUMBER"`
-	WORD_COUNT       uint16            `json:"WORD_COUNT"`
-	BYTE_COUNT       uint8             `json:"BYTE_COUNT"`
-	REGISTER_DATA    map[uint16]uint16 `json:"DATA"`
-}
-
-type Modbus_FUNCTIONS_CODE_15_16_responce struct {
-	FUNCTION_CODE    uint8  `json:"FUNCTION_CODE"`
-	REFERENCE_NUMBER uint16 `json:"REFERENCE_NUMBER"`
-	BIT_COUNT        uint16 `json:"BITE_COUNT"`
-}
-
-////////////////////////
-
-// //////////////////////
-// convertions sections
-// //////////////////////
-
-func byte_decimal_array_to_decimal_uint8(array []byte) uint8 {
-	//because i ger decimal value in eatch array
-	//i need to convert to hex concat and then convert to decimal , and i have the value.
-	byteArray := array
-	hexadecimal_num := hex.EncodeToString(byteArray)
-	fmt.Println("Encoded Hex String: ", hexadecimal_num)
-	// use the parseInt() function to convert
-	decimal_num, err := strconv.ParseInt(hexadecimal_num, 16, 64)
-	decimal_value := uint8(decimal_num)
-
-	// in case of any error
-	if err != nil {
-		panic(err)
-	}
-	return decimal_value
-}
-
 func byte_decimal_array_to_decimal_uint16(array []byte) uint16 {
-
-	//because i ger decimal value in eatch array
-	//i need to convert to hex concat and then convert to decimal , and i have the value.
+	//	because I get decimal value in each array
+	//	I need to convert to hex concat and then convert to decimal.
 	byteArray := array
 	hexadecimal_num := hex.EncodeToString(byteArray)
 	//fmt.Println("Encoded Hex String: ", hexadecimal_num)
@@ -164,9 +40,9 @@ func byte_decimal_array_to_decimal_uint16(array []byte) uint16 {
 
 // debug PoC funtions
 // get the byte array from the TCP payload sections from the net_sniff_modbus_tcp.go
-func viewModbusTCPEvent(modbus []byte) ModbusTCP_struct {
+func viewModbusTCPEvent(modbus []byte) packets.ModbusTCP_struct {
 	// structure of the current modbusTCP sections of the packet
-	ModbusTCP_currentPacket := ModbusTCP_struct{
+	ModbusTCP_currentPacket := packets.ModbusTCP_struct{
 		TID:    byte_decimal_array_to_decimal_uint16(modbus[0:2]),
 		Lenght: uint16(modbus[4])*1000 + uint16(modbus[5]),
 		UID:    uint8(modbus[6]),
@@ -174,219 +50,35 @@ func viewModbusTCPEvent(modbus []byte) ModbusTCP_struct {
 	return ModbusTCP_currentPacket
 }
 
-func VIEW_FUNCTIONS_CODE_1_OR_2(query []byte, responce []byte) (Modbus_FUNCTIONS_CODE_1_OR_2_query, Modbus_FUNCTIONS_CODE_1_OR_2_responce) {
-
-	ModbusTCP_currentPacket_query := Modbus_FUNCTIONS_CODE_1_OR_2_query{
-		FUNCTION_CODE:    uint8(query[0]),
-		REFERENCE_NUMBER: byte_decimal_array_to_decimal_uint16(query[1:3]),
-		//strconv.FormatUint(decimal, 16)
-		BITE_COUNT: byte_decimal_array_to_decimal_uint16(query[3:5]),
-	}
-
-	count := 0
-	DATA := responce[2:]
-	parsed_data := map[uint16]byte{}
-	REFERENCE_NUMBER := byte_decimal_array_to_decimal_uint16(query[1:3])
-	BITE_COUNT := byte_decimal_array_to_decimal_uint16(query[3:5])
-	for uint16(count) < BITE_COUNT {
-		num := DATA[count]
-		for i := 0; i <= 7; i++ { // Iterate from MSB to LSB
-			//fmt.Print("		value of byte ", i, ": ")
-			//fmt.Printf("%d \n", (num>>i)&1)
-			coil_number := i + int(REFERENCE_NUMBER)
-			value := (num >> i) & 1
-			parsed_data[uint16(coil_number)] = value
-			//fmt.Println("coil number :", coil_number, " || Value:", value)
-			count++
-		}
-	}
-
-	ModbusTCP_currentPacket_responce := Modbus_FUNCTIONS_CODE_1_OR_2_responce{
-		FUNCTION_CODE: uint8(responce[0]),
-		BITE_COUNT:    uint8(responce[1]),
-		DATA:          parsed_data,
-	}
-	// extract the value of eatch coil
-	// counter for the number of byte to do
-
-	return ModbusTCP_currentPacket_query, ModbusTCP_currentPacket_responce
-}
-
-func VIEW_FUNCTIONS_CODE_3_OR_4(query []byte, responce []byte) (Modbus_FUNCTIONS_CODE_3_OR_4_query, Modbus_FUNCTIONS_CODE_3_OR_4_responce) {
-	//parsed_data map[uint16]uint16
-	// structure of the current modbusTCP sections of the packet
-	ModbusTCP_currentPacket_query := Modbus_FUNCTIONS_CODE_3_OR_4_query{
-		FUNCTION_CODE:    uint8(query[0]),
-		REFERENCE_NUMBER: byte_decimal_array_to_decimal_uint16(query[1:3]),
-		WORD_COUNT:       byte_decimal_array_to_decimal_uint16(query[3:5]),
-	}
-	// try to make the data parsing herer instead of the print area
-	// ta add
-	// - a new type to return that will represent the parsed data
-	// ISSUE: inly display alf of the register , and output then in the wrong order
-	DATA := responce[2:]
-	count := 0
-	count_data := 0
-	count_register := 0
-	word_count := byte_decimal_array_to_decimal_uint16(query[3:5])
-	parsed_data := map[uint16]uint16{}
-	fmt.Println("value of wordcount", word_count)
-	start_reference_number := byte_decimal_array_to_decimal_uint16(query[1:3])
-	for count < int(word_count) {
-		register_number := int(start_reference_number) + count_register
-		value := byte_decimal_array_to_decimal_uint16(DATA[count_data : count_data+2])
-		parsed_data[uint16(register_number)] = value
-		//fmt.Println("register number :", register_number, " || Value:", value)
-		count_register++
-		count++
-		count_data++
-		count_data++
-
-	}
-	ModbusTCP_currentPacket_responce := Modbus_FUNCTIONS_CODE_3_OR_4_responce{
-		FUNCTION_CODE: uint8(responce[0]),
-		BYTE_COUNT:    byte_decimal_array_to_decimal_uint16(responce[1:2]),
-		DATA:          parsed_data,
-	}
-
-	//fmt.Println("after test")
-	return ModbusTCP_currentPacket_query, ModbusTCP_currentPacket_responce
-}
-
-func VIEW_FUNCTIONS_CODE_5_OR_6(modbus []byte) Modbus_FUNCTIONS_CODE_5_OR_6_query {
-	// structure of the current modbusTCP sections of the packet
-	ModbusTCP_currentPacket := Modbus_FUNCTIONS_CODE_5_OR_6_query{
-		FUNCTION_CODE:    uint8(modbus[0]),
-		REFERENCE_NUMBER: byte_decimal_array_to_decimal_uint16(modbus[1:3]),
-		// wireshark represent it in heaxdecimal , i choose to represent it in decimal
-		DATA: byte_decimal_array_to_decimal_uint16(modbus[3:5]),
-	}
-	return ModbusTCP_currentPacket
-}
-
-func VIEW_FUNCTIONS_CODE_15(query []byte, responce []byte) (Modbus_FUNCTIONS_CODE_15_query, Modbus_FUNCTIONS_CODE_15_16_responce) {
-	// structure of the current modbusTCP sections of the packet
-
-	// get the data value as bite and not as hex valu
-	count := 0
-	DATA := query[6:]
-	parsed_data := map[uint16]byte{}
-	REFERENCE_NUMBER := byte_decimal_array_to_decimal_uint16(query[1:3])
-	BIT_COUNT := byte_decimal_array_to_decimal_uint16(query[3:5])
-	BYTE_COUNT := byte_decimal_array_to_decimal_uint8(query[5:6])
-	for uint16(count) < uint16(BIT_COUNT) {
-		num := DATA[count]
-		for i := 0; i <= 7; i++ { // Iterate from MSB to LSB
-			//fmt.Print("		value of byte ", i, ": ")
-			//fmt.Printf("%d \n", (num>>i)&1)
-			coil_number := i + int(REFERENCE_NUMBER)
-			value := (num >> i) & 1
-			parsed_data[uint16(coil_number)] = value
-			//fmt.Println("coil number :", coil_number, " || Value:", value)
-			count++
-		}
-		// verify that BIT_DATA , charge well the bit that we get.
-	}
-
-	ModbusTCP_currentPacket_query := Modbus_FUNCTIONS_CODE_15_query{
-		FUNCTION_CODE:    uint8(query[0]),
-		REFERENCE_NUMBER: REFERENCE_NUMBER,
-		BIT_COUNT:        BIT_COUNT,
-		BYTE_COUNT:       BYTE_COUNT,
-		BIT_DATA:         parsed_data,
-	}
-
-	ModbusTCP_currentPacket_responce := Modbus_FUNCTIONS_CODE_15_16_responce{
-		FUNCTION_CODE:    uint8(responce[0]),
-		REFERENCE_NUMBER: byte_decimal_array_to_decimal_uint16(responce[1:3]),
-		BIT_COUNT:        byte_decimal_array_to_decimal_uint16(responce[3:5]),
-	}
-
-	return ModbusTCP_currentPacket_query, ModbusTCP_currentPacket_responce
-}
-
-func VIEW_FUNCTIONS_CODE_16(query []byte, responce []byte) (Modbus_FUNCTIONS_CODE_16_query, Modbus_FUNCTIONS_CODE_15_16_responce) {
-	// structure of the current modbusTCP sections of the packet
-
-	fmt.Println("test test")
-	// get the data value as bite and not as hex valu
-	count := 0
-	REFERENCE_NUMBER := byte_decimal_array_to_decimal_uint16(query[1:3])
-	BIT_COUNT := byte_decimal_array_to_decimal_uint16(query[3:5])
-
-	BYTE_COUNT := byte_decimal_array_to_decimal_uint8(query[5:6])
-	//REGISTER_DATA := []byte{}
-	// retrieve de data from the start added to the number of bite.
-	DATA := query[6:]
-	// the next step is to print the bit value of the extrat byte and add them in an array.
-
-	count_data := 0
-	count_register := 0
-	word_count := byte_decimal_array_to_decimal_uint16(query[3:5])
-	parsed_Register_data := map[uint16]uint16{}
-	fmt.Println("value of wordcount", word_count)
-	start_reference_number := byte_decimal_array_to_decimal_uint16(query[1:3])
-	for count < int(word_count) {
-		register_number := int(start_reference_number) + count_register
-		value := byte_decimal_array_to_decimal_uint16(DATA[count_data : count_data+2])
-		parsed_Register_data[uint16(register_number)] = value
-		//fmt.Println("register number :", register_number, " || Value:", value)
-		count_register++
-		count++
-		count_data++
-		count_data++
-
-	}
-
-	ModbusTCP_currentPacket_query := Modbus_FUNCTIONS_CODE_16_query{
-		FUNCTION_CODE:    uint8(query[0]),
-		REFERENCE_NUMBER: REFERENCE_NUMBER,
-		WORD_COUNT:       BIT_COUNT,
-		BYTE_COUNT:       BYTE_COUNT,
-		REGISTER_DATA:    parsed_Register_data,
-	}
-
-	ModbusTCP_currentPacket_responce := Modbus_FUNCTIONS_CODE_15_16_responce{
-		FUNCTION_CODE:    uint8(responce[0]),
-		REFERENCE_NUMBER: byte_decimal_array_to_decimal_uint16(responce[1:3]),
-		BIT_COUNT:        byte_decimal_array_to_decimal_uint16(responce[3:5]),
-	}
-
-	return ModbusTCP_currentPacket_query, ModbusTCP_currentPacket_responce
-}
-
-///////////////////////////////////////////////////
-// end of the packet/modbus.go sections ///////////
-///////////////////////////////////////////////////
-
 ///////////////////////////////////////////////////
 // start of the linked list section  //////////////
 ///////////////////////////////////////////////////
 
 /*
-du au fait qu'il peut y avoir des packet qui se chevauche dans l'aordre d'arriver
-il faut crée un paradigme ou les requéte (query) sont stocker en attandant leur reponce
-on fait celas via une liste chainer , on stoque le port source et le payload TCP de la quéte
-puis on le place dans une liste.
-quand on recoit une reponse , on récupére sont port destinations , on parcour la liste
-et si son port match , on récupére la valeur , et on suprime son noeud de la liste
+Due to the fact that there may be overlapping packets in the order of arrival.
+We need to create a paradigm where queries are stored while waiting for their response.
+
+We do this via a chained list, stopping the source port and TCP payload of the query
+then place it in a list.
+
+When we receive a response, we retrieve its destination port, go through the list
+and if its port matches, we retrieve the value, and delete its node from the list
 */
-// definitions du noeud
+//	Node definition
 type Node struct {
 	src_port    string
 	tcp_payload []byte
 	next        *Node
 }
 
-// definitions de la chaine
+// Chain definition
 type List struct {
 	head *Node
 }
 
-// ajoute un noeud a la chaine
+// Add node to chain
 func (l *List) add(value string, TCP_payload []byte) {
 	newNode := &Node{src_port: value, tcp_payload: TCP_payload}
-
 	if l.head == nil {
 		l.head = newNode
 		return
@@ -395,26 +87,22 @@ func (l *List) add(value string, TCP_payload []byte) {
 	for curr.next != nil {
 		curr = curr.next
 	}
-
 	curr.next = newNode
 }
 
-// suprime le noeud de la chaine
+// Delete node from chain
 func (l *List) remove(value string) {
 	//var wanted_modbus_payload []byte
 
-	//fin de la chaine
+	//	End of the chain
 	if l.head == nil {
 
 	}
-	// si valeur
 	if l.head.src_port == value {
 		//wanted_modbus_payload = l.head.tcp_payload
-		//fmt.Printf("the query for the current responce : ", l.head.src_port)
+		//fmt.Printf("the query for the current reply : ", l.head.src_port)
 		l.head = l.head.next
-
 	}
-
 	curr := l.head
 	for curr.next != nil && curr.next.src_port != value {
 		curr = curr.next
@@ -429,9 +117,14 @@ func (l *List) remove(value string) {
 // retrieve the stored query
 func get_stored_query(l *List, val string) []byte {
 	curr := l.head
-
 	var tcp_p []byte
-	// noter que il ne peut rentrer dans la boucke car  elle et vide
+
+	//	Note that the query cannot be analyze in the loop if it is empty
+	if val == "" {
+		fmt.Println("empty line found")
+		return nil
+	}
+
 	for curr != nil {
 		//fmt.Println("value of the port in the linked list", curr.src_port)
 		if curr.src_port == val {
@@ -446,7 +139,7 @@ func get_stored_query(l *List, val string) []byte {
 	return tcp_p
 }
 
-// pritn the linked list node by node
+// print the linked list node by node
 func printList(l *List) {
 	curr := l.head
 	//fmt.Println("value of cur ", curr, "\n")
@@ -462,16 +155,16 @@ func printList(l *List) {
 // end of the linked list section  ////////////////
 ///////////////////////////////////////////////////
 
-// ajouter le port source et destnations
+// Add Source / Destination ports
 func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, tcp *layers.TCP) bool {
+
 	// define the list for the linked list
 	//list := &List{}
 	//var Is_query = false
-	//var Is_responce = false
-
+	//var Is_reply = false
 	modbus := pkt.TransportLayer().LayerPayload()
 	transportlayer := pkt.TransportLayer()
-
+	//packets.PrintStuff()
 	ip_tcp := transportlayer.(*layers.TCP)
 
 	dstPORT := ip_tcp.DstPort.String()
@@ -482,73 +175,76 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 
 	ModbusTCP_currentPacket := viewModbusTCPEvent(modbus)
 	//FunctionsCode := modbus[7]
-	// define if this is a query or a responce
+	// define if this is a query or a reply
 	// query
 	if strings.Contains(dstPORT[0:4], "502(") && ModbusTCP_currentPacket.PID == uint16(0) {
 		//Is_query = true
-		//Is_responce = false
+		//Is_reply = false
 		list.add(srcPORT[0:5], modbus)
 
 	}
-	// response
+	//	Reply
 	if strings.Contains(srcPORT[0:4], "502(") && ModbusTCP_currentPacket.PID == uint16(0) {
-		//Is_responce = true
+		//Is_reply = true
 		//Is_query = false
 		query_payload := get_stored_query(list, dstPORT[0:5])
-		//responce_payload := modbus
+		//reply_payload := modbus
 		if query_payload != nil {
 			//fmt.Println("\nquery paylaods : ", query_payload)
-			//fmt.Println("responce paylaods : ", modbus)
-			// real zone , in this time we have the query and the responce
+			//fmt.Println("reply paylaods : ", modbus)
+			// real zone , in this time we have the query and the reply
 			FunctionsCode := modbus[7]
 
 			fmt.Println("function code detected: ", FunctionsCode)
 			switch FunctionsCode {
-			case READ_COILS:
-				read_coil, responce := VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
-				fmt.Println("\n ////////////////////////")
-				fmt.Println("modbus")
-				fmt.Println(srcIP)
-				fmt.Println(dstIP)
-				fmt.Println("/////")
-				fmt.Println(" ModbusTCP")
-				fmt.Println("	TID = ", ModbusTCP_currentPacket.TID)
-				fmt.Println("	PID = ", ModbusTCP_currentPacket.PID)
-				fmt.Println("	Lenght = ", ModbusTCP_currentPacket.Lenght)
-				fmt.Println("	UID = ", ModbusTCP_currentPacket.UID)
-				fmt.Println("/////")
-				fmt.Println(" Modbus query")
-				fmt.Println("	Functions code = ", read_coil.FUNCTION_CODE, " READ_COIL")
-				fmt.Println("	Reference Number = ", read_coil.REFERENCE_NUMBER)
-				fmt.Println("	Bit count = ", read_coil.BITE_COUNT)
-				fmt.Println("/////")
-				fmt.Println(" Modbus responce")
-				fmt.Println("	Functions code = ", responce.FUNCTION_CODE)
-				// print the value of the data byte value
-				// counter for the number of byte to do
-				for key, value := range responce.DATA {
-					fmt.Println("coil number :", key, " || Value:", value)
-				}
-
-				//fmt.Println("data requested", modbus[9:])
-			case READ_COIL_EXEPTION:
-				fmt.Println("entering the error handeling")
-				//read_coil_exeptions, responce := viewModbusTCPEvent(modbus[])
-				fmt.Println("\n ////////////////////////")
-				fmt.Println("modbus")
-				fmt.Println(srcIP)
-				fmt.Println(dstIP)
-				fmt.Println("/////")
-				fmt.Println(" ModbusTCP")
-				fmt.Println("	TID = ", ModbusTCP_currentPacket.TID)
-				fmt.Println("	PID = ", ModbusTCP_currentPacket.PID)
-				fmt.Println("	Lenght = ", ModbusTCP_currentPacket.Lenght)
-				fmt.Println("	UID = ", ModbusTCP_currentPacket.UID)
-
-				fmt.Println("ERROR HANDELING : EXEPTIONS CODE :", modbus[8:], "on functions code :", READ_COILS)
-			case READ_DISCRETE_INPUTS:
+			case packets.READ_COILS:
 				if uint16(modbus[9]) != uint16(2) {
-					read_discrete_input, responce := VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
+					read_coil, reply := packets.VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
+					fmt.Println("\n ////////////////////////")
+					fmt.Println("modbus")
+					fmt.Println(srcIP)
+					fmt.Println(dstIP)
+					fmt.Println("/////")
+					fmt.Println(" ModbusTCP")
+					fmt.Println("	TID = ", ModbusTCP_currentPacket.TID)
+					fmt.Println("	PID = ", ModbusTCP_currentPacket.PID)
+					fmt.Println("	Lenght = ", ModbusTCP_currentPacket.Lenght)
+					fmt.Println("	UID = ", ModbusTCP_currentPacket.UID)
+					fmt.Println("/////")
+					fmt.Println(" Modbus query")
+					fmt.Println("	Functions code = ", read_coil.FUNCTION_CODE, " READ_COIL")
+					fmt.Println("	Reference Number = ", read_coil.REFERENCE_NUMBER)
+					fmt.Println("	Bit count = ", read_coil.BITE_COUNT)
+					fmt.Println("/////")
+					fmt.Println(" Modbus reply")
+					fmt.Println("	Functions code = ", reply.FUNCTION_CODE)
+					// print the value of the data byte value
+					// counter for the number of byte to do
+					for key, value := range reply.DATA {
+						fmt.Println("coil number :", key, " || Value:", value)
+					}
+				} else {
+					fmt.Println("Exeption code: Illegal data address")
+				}
+				//fmt.Println("data requested", modbus[9:])
+			case packets.READ_COIL_EXEPTION:
+				fmt.Println("entering the error handeling")
+				//read_coil_exeptions, reply := viewModbusTCPEvent(modbus[])
+				fmt.Println("\n ////////////////////////")
+				fmt.Println("modbus")
+				fmt.Println(srcIP)
+				fmt.Println(dstIP)
+				fmt.Println("/////")
+				fmt.Println(" ModbusTCP")
+				fmt.Println("	TID = ", ModbusTCP_currentPacket.TID)
+				fmt.Println("	PID = ", ModbusTCP_currentPacket.PID)
+				fmt.Println("	Lenght = ", ModbusTCP_currentPacket.Lenght)
+				fmt.Println("	UID = ", ModbusTCP_currentPacket.UID)
+
+				fmt.Println("ERROR HANDELING : EXEPTIONS CODE :", modbus[8:], "on functions code :", packets.READ_COILS)
+			case packets.READ_DISCRETE_INPUTS:
+				if uint16(modbus[9]) != uint16(2) {
+					read_discrete_input, reply := packets.VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
 					fmt.Println("\n ////////////////////////")
 					fmt.Println("modbus")
 					fmt.Println(srcIP)
@@ -565,12 +261,12 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 					fmt.Println("	Reference Number = ", read_discrete_input.REFERENCE_NUMBER)
 					fmt.Println("	Bit count = ", read_discrete_input.BITE_COUNT)
 					fmt.Println("/////")
-					fmt.Println(" Modbus responce")
-					fmt.Println("	Functions code = ", responce.FUNCTION_CODE)
+					fmt.Println(" Modbus reply")
+					fmt.Println("	Functions code = ", reply.FUNCTION_CODE)
 
 					// print the value of the data byte value
-					// counter for the number of byte to do
-					for key, value := range responce.DATA {
+					// counter for the number of byte to analyze
+					for key, value := range reply.DATA {
 						fmt.Println("coil number :", key, " || Value:", value)
 					}
 				} else {
@@ -578,12 +274,11 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 				}
 				//fmt.Println("data requested : ", modbus[9:])
 			// functions code 3 , same concept as the read coil , but with register instead of coil.
-			case READ_MULTIPLE_HOLDING_REGISTERS:
+			case packets.READ_MULTIPLE_HOLDING_REGISTERS:
 				//fmt.Println("read multiple haloding register entering functions")
-				query, responce := VIEW_FUNCTIONS_CODE_3_OR_4(query_payload[7:], modbus[7:])
+				query, reply := packets.VIEW_FUNCTIONS_CODE_3_OR_4(query_payload[7:], modbus[7:])
 
-				//read_coil, responce := VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
-				fmt.Println(query, responce)
+				//read_coil, reply := VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
 				fmt.Println("\n ////////////////////////")
 				fmt.Println("\n modbus")
 				fmt.Println(srcIP)
@@ -600,17 +295,18 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 				fmt.Println("Reference Number = ", query.REFERENCE_NUMBER)
 				fmt.Println("Word count = ", query.WORD_COUNT)
 				fmt.Println("/////")
-				fmt.Println(" Modbus responce")
-				fmt.Println("Functions code = ", responce.FUNCTION_CODE)
-				fmt.Println("Byte count= ", responce.BYTE_COUNT)
+				fmt.Println(" Modbus reply")
+				fmt.Println("Functions code = ", reply.FUNCTION_CODE)
+				fmt.Println("Byte count= ", reply.BYTE_COUNT)
+
 				// print the uint16 register
-				for key, value := range responce.DATA {
+				for key, value := range reply.DATA {
 					fmt.Println("register number :", key, " || Value:", value)
 				}
 
-			case READ_INPUT_REGISTERS:
-				query, responce := VIEW_FUNCTIONS_CODE_3_OR_4(query_payload[7:], modbus[7:])
-				//read_coil, responce := VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
+			case packets.READ_INPUT_REGISTERS:
+				query, reply := packets.VIEW_FUNCTIONS_CODE_3_OR_4(query_payload[7:], modbus[7:])
+				//read_coil, reply := VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
 				fmt.Println("\n ////////////////////////")
 				fmt.Println("\n modbus")
 				fmt.Println(srcIP)
@@ -627,16 +323,16 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 				fmt.Println("Reference Number = ", query.REFERENCE_NUMBER)
 				fmt.Println("Word count = ", query.WORD_COUNT)
 				fmt.Println("/////")
-				fmt.Println(" Modbus responce")
-				fmt.Println("Functions code = ", responce.FUNCTION_CODE)
-				fmt.Println("Byte count= ", responce.BYTE_COUNT)
+				fmt.Println(" Modbus reply")
+				fmt.Println("Functions code = ", reply.FUNCTION_CODE)
+				fmt.Println("Byte count= ", reply.BYTE_COUNT)
 				// print the uint16 register
-				for key, value := range responce.DATA {
+				for key, value := range reply.DATA {
 					fmt.Println("register number :", key, " || Value:", value)
 				}
 
-			case WRITE_SINGLE_HOLDING_REGISTER:
-				write_signle_holding_register := VIEW_FUNCTIONS_CODE_5_OR_6(modbus[7:])
+			case packets.WRITE_SINGLE_HOLDING_REGISTER:
+				write_signle_holding_register := packets.VIEW_FUNCTIONS_CODE_5_OR_6(modbus[7:])
 				NewSnifferEvent(
 					pkt.Metadata().Timestamp,
 					"modbus",
@@ -653,13 +349,13 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 					tui.Yellow("\nFunctions code = "+strconv.FormatUint(uint64(write_signle_holding_register.FUNCTION_CODE), 10)+" WRITE_SINGLE_HOLDING_REGISTER"),
 					tui.Yellow("\nReference Number = "+strconv.FormatUint(uint64(write_signle_holding_register.REFERENCE_NUMBER), 10)),
 					tui.Yellow("\nData = "+strconv.FormatUint(uint64(write_signle_holding_register.DATA), 10)),
-					tui.Red("\n Modbus Responce"),
+					tui.Red("\n Modbus reply"),
 					tui.Yellow("\nFunctions code = "+strconv.FormatUint(uint64(write_signle_holding_register.FUNCTION_CODE), 10)+" WRITE_SINGLE_HOLDING_REGISTER"),
 					tui.Yellow("\nReference Number = "+strconv.FormatUint(uint64(write_signle_holding_register.REFERENCE_NUMBER), 10)),
 					tui.Yellow("\nData = "+strconv.FormatUint(uint64(write_signle_holding_register.DATA), 10)),
 				).Push()
-			case WRITE_SINGLE_COIL:
-				write_signle_coil := VIEW_FUNCTIONS_CODE_5_OR_6(modbus[7:])
+			case packets.WRITE_SINGLE_COIL:
+				write_signle_coil := packets.VIEW_FUNCTIONS_CODE_5_OR_6(modbus[7:])
 				NewSnifferEvent(
 					pkt.Metadata().Timestamp,
 					"modbus",
@@ -676,62 +372,12 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 					tui.Yellow("\nFunctions code = "+strconv.FormatUint(uint64(write_signle_coil.FUNCTION_CODE), 10)+" WRITE_SINGLE_COIL"),
 					tui.Yellow("\nReference Number = "+strconv.FormatUint(uint64(write_signle_coil.REFERENCE_NUMBER), 10)),
 					tui.Yellow("\nData = "+strconv.FormatUint(uint64(write_signle_coil.DATA), 10)),
-					tui.Red("\n Modbus Responce"),
+					tui.Red("\n Modbus reply"),
 					tui.Yellow("\nFunctions code = "+strconv.FormatUint(uint64(write_signle_coil.FUNCTION_CODE), 10)+" WRITE_SINGLE_COIL"),
 					tui.Yellow("\nReference Number = "+strconv.FormatUint(uint64(write_signle_coil.REFERENCE_NUMBER), 10)),
 					tui.Yellow("\nData = "+strconv.FormatUint(uint64(write_signle_coil.DATA), 10)),
 				).Push()
-
-			case WRITE_MULTIPLE_COILS:
-				query, responce := VIEW_FUNCTIONS_CODE_15(query_payload[7:], modbus[7:])
-				fmt.Println("\n ////////////////////////")
-				fmt.Println("modbus")
-				fmt.Println(srcIP)
-				fmt.Println(dstIP)
-				fmt.Println("/////")
-				fmt.Println(" ModbusTCP")
-				fmt.Println("	TID = ", ModbusTCP_currentPacket.TID)
-				fmt.Println("	PID = ", ModbusTCP_currentPacket.PID)
-				fmt.Println("	Lenght = ", ModbusTCP_currentPacket.Lenght)
-				fmt.Println("	UID = ", ModbusTCP_currentPacket.UID)
-				fmt.Println("/////")
-				fmt.Println(" Modbus query")
-				fmt.Println("	Functions code = ", query.FUNCTION_CODE, "WRITE_MULTIPLE_COIL")
-				fmt.Println("	Reference Number = ", query.REFERENCE_NUMBER)
-				fmt.Println("	Bit count = ", query.BIT_COUNT)
-				fmt.Println("	Byte count = ", query.BYTE_COUNT)
-				fmt.Println("	Bit representations of the write coil =", query.BIT_DATA)
-				fmt.Println("/////")
-				fmt.Println(" Modbus responce")
-				fmt.Println("Functions code = ", responce.FUNCTION_CODE)
-				fmt.Println("Byte count= ", responce.BIT_COUNT)
-
-			case WRITE_MULTIPLE_HOLDING_REGISTERS:
-				fmt.Println("test test")
-				query, responce := VIEW_FUNCTIONS_CODE_16(query_payload[7:], modbus[7:])
-				fmt.Println("\n ////////////////////////")
-				fmt.Println("modbus")
-				fmt.Println(srcIP)
-				fmt.Println(dstIP)
-				fmt.Println("/////")
-				fmt.Println(" ModbusTCP")
-				fmt.Println("	TID = ", ModbusTCP_currentPacket.TID)
-				fmt.Println("	PID = ", ModbusTCP_currentPacket.PID)
-				fmt.Println("	Lenght = ", ModbusTCP_currentPacket.Lenght)
-				fmt.Println("	UID = ", ModbusTCP_currentPacket.UID)
-				fmt.Println("/////")
-				fmt.Println(" Modbus query")
-				fmt.Println("	Functions code = ", query.FUNCTION_CODE, "WRITE_MULTIPLE_HOLDING_REGISTER")
-				fmt.Println("	Reference Number = ", query.REFERENCE_NUMBER)
-				fmt.Println("	Bit count = ", query.WORD_COUNT)
-				fmt.Println("	Byte count = ", query.BYTE_COUNT)
-				fmt.Println("	Bit representations of the write coil =", query.REGISTER_DATA)
-				fmt.Println("/////")
-				fmt.Println(" Modbus responce")
-				fmt.Println("Functions code = ", responce.FUNCTION_CODE)
-				fmt.Println("Byte count= ", responce.BIT_COUNT)
-
-			case 7, 8, 9, 10, 11, 12, 13, 14:
+			case 7, 8, 9, 10, 11, 12, 13, 14, 15:
 				NewSnifferEvent(
 					pkt.Metadata().Timestamp,
 					"modbusTCP",
@@ -739,7 +385,7 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 					dstIP.String(),
 					ModbusTCP_currentPacket,
 					"%s %s %s %s %s %s",
-					tui.Red("\n ModbusTCP Responce"),
+					tui.Red("\n ModbusTCP reply"),
 					tui.Yellow("\nTID = "+strconv.FormatUint(uint64(ModbusTCP_currentPacket.TID), 10)),
 					tui.Yellow("\nPID = "+strconv.FormatUint(uint64(ModbusTCP_currentPacket.PID), 10)),
 					tui.Yellow("\nLenght = "+strconv.FormatUint(uint64(ModbusTCP_currentPacket.Lenght), 10)),
@@ -754,7 +400,7 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 					dstIP.String(),
 					ModbusTCP_currentPacket,
 					"%s %s %s %s %s %s",
-					tui.Red("\n ModbusTCP Responce"),
+					tui.Red("\n ModbusTCP reply"),
 					tui.Yellow("\nTID = "+strconv.FormatUint(uint64(ModbusTCP_currentPacket.TID), 10)),
 					tui.Yellow("\nPID = "+strconv.FormatUint(uint64(ModbusTCP_currentPacket.PID), 10)),
 					tui.Yellow("\nLenght = "+strconv.FormatUint(uint64(ModbusTCP_currentPacket.Lenght), 10)),

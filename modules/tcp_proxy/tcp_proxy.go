@@ -6,8 +6,8 @@ import (
 	"net"
 	"sync"
 
-	"github.com/bettercap/bettercap/firewall"
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/firewall"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/robertkrimen/otto"
 )

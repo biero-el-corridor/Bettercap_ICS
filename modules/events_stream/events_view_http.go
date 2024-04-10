@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bettercap/bettercap/modules/net_sniff"
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/modules/net_sniff"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/evilsocket/islazy/tui"
 )
@@ -175,7 +175,7 @@ func (mod *EventsStream) viewHttpResponse(output io.Writer, e session.Event) {
 	se := e.Data.(net_sniff.SnifferEvent)
 	res := se.Data.(net_sniff.HTTPResponse)
 
-	fmt.Fprintf(output, "[%s] [%s] %s\n", 
+	fmt.Fprintf(output, "[%s] [%s] %s\n",
 		e.Time.Format(mod.timeFormat),
 		tui.Green(e.Tag),
 		se.Message)

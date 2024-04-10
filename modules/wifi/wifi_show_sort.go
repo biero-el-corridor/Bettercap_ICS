@@ -1,8 +1,8 @@
 package wifi
 
 import (
-	"github.com/bettercap/bettercap/network"
-	"github.com/bettercap/bettercap/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/network"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
 )
 
 type ByRSSISorter []*network.Station

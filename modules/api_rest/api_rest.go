@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bettercap/bettercap/session"
-	"github.com/bettercap/bettercap/tls"
+	"github.com/biero-el-corridor/Bettercap_ICS/session"
+	"github.com/biero-el-corridor/Bettercap_ICS/tls"
 
 	"github.com/bettercap/recording"
 
