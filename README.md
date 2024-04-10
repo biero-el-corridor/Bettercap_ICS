@@ -10,6 +10,10 @@
 
 bettercap is a powerful, easily extensible and portable framework written in Go which aims to offer to security researchers, red teamers and reverse engineers an **easy to use**, **all-in-one solution** with all the features they might possibly need for performing reconnaissance and attacking [WiFi](https://www.bettercap.org/modules/wifi/) networks, [Bluetooth Low Energy](https://www.bettercap.org/modules/ble/) devices, wireless [HID](https://www.bettercap.org/modules/hid/) devices and [Ethernet](https://www.bettercap.org/modules/ethernet) networks.
 
+This forks focus on ICS Protocol, for now the Modbus protocol with the Functions Code 1,2,2,3,4,5,6 have been implemented (FC 15 and 16 need to be tested). 
+
+I work on adding the S7comm ptotocol , and maybe in the future somme good stuff like OPC-UA or on the fly packet modifications. 
+
 ![UI](https://raw.githubusercontent.com/bettercap/media/master/ui-events.png)
 
 ## Main Features
