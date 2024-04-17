@@ -459,11 +459,7 @@ func modbusTcpParser(srcIP, dstIP net.IP, payload []byte, pkt gopacket.Packet, t
 			switch FunctionsCode {
 			case packets.READ_COILS:
 				if uint16(modbus[9]) != uint16(2) {
-<<<<<<< HEAD
 					read_coil, reply := packets.VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
-=======
-					read_coil, reply := VIEW_FUNCTIONS_CODE_1_OR_2(query_payload[7:], modbus[7:])
->>>>>>> 709add8f2065d37023659ce90dfbb4247656e066
 					fmt.Println("\n ////////////////////////")
 					fmt.Println("modbus")
 					fmt.Println(srcIP)
