@@ -1,39 +1,67 @@
+<h1 style="text-align: center;">Bettercap ICS</h1>
+
+
 <p align="center">
   <img alt="BetterCap" src="https://raw.githubusercontent.com/bettercap/media/master/logo.png" height="140" />
-  <p align="center">
-    <a href="https://github.com/biero-el-corridor/Bettercap_ICS/releases/latest"><img alt="Release" src="https://img.shields.io/github/release/bettercap/bettercap.svg?style=flat-square"></a>
-    <a href="https://github.com/biero-el-corridor/Bettercap_ICS/blob/master/LICENSE.md"><img alt="Software License" src="https://img.shields.io/badge/license-GPL3-brightgreen.svg?style=flat-square"></a>
-    <a href="https://travis-ci.org/bettercap/bettercap"><img alt="Travis" src="https://img.shields.io/travis/bettercap/bettercap/master.svg?style=flat-square"></a>
-
-  </p>
 </p>
 
-bettercap is a powerful, easily extensible and portable framework written in Go which aims to offer to security researchers, red teamers and reverse engineers an **easy to use**, **all-in-one solution** with all the features they might possibly need for performing reconnaissance and attacking [WiFi](https://www.bettercap.org/modules/wifi/) networks, [Bluetooth Low Energy](https://www.bettercap.org/modules/ble/) devices, wireless [HID](https://www.bettercap.org/modules/hid/) devices and [Ethernet](https://www.bettercap.org/modules/ethernet) networks.
+Bettercap_ICS is an unofficial fork of bettercap, with the aim of adding industrial protocols and new exfiltration techniques to the existing framework. 
 
-This forks focus on ICS Protocol, for now the Modbus protocol with the Functions Code 1,2,2,3,4,5,6 have been implemented (FC 15 and 16 need to be tested). 
+**WARNING**: This repository is in developement , does not take this version as it.  
 
-I work on adding the S7comm ptotocol , and maybe in the future somme good stuff like OPC-UA or on the fly packet modifications. 
+## Added feature 
 
-![UI](https://raw.githubusercontent.com/bettercap/media/master/ui-events.png)
+* **Modbus dissector** for the following Functions Code (1,2,3,4,5,6)
+  * Functions 15 and 16 have been implemented but not tested.
+* **data exfiltrations** by icmp protocol 
+  * Integrity check via **checksum** 
+  * 32 byte chuncked data for eatch icmp packet sent.
+  * Serveur writen in python (**scapy**) for icmp packet handleing (interface selecitons via flag)  
+  * Exfiltrations not working for modbus functions code 15 and 16.
 
-## Main Features
 
-* **WiFi** networks scanning, [deauthentication attack](https://www.evilsocket.net/2018/07/28/Project-PITA-Writeup-build-a-mini-mass-deauther-using-bettercap-and-a-Raspberry-Pi-Zero-W/), [clientless PMKID association attack](https://www.evilsocket.net/2019/02/13/Pwning-WiFi-networks-with-bettercap-and-the-PMKID-client-less-attack/) and automatic WPA/WPA2 client handshakes capture.
-* **Bluetooth Low Energy** devices scanning, characteristics enumeration, reading and writing.
-* 2.4Ghz wireless devices scanning and **MouseJacking** attacks with over-the-air HID frames injection (with DuckyScript support).
-* Passive and active IP network hosts probing and recon.
-* **ARP, DNS, NDP and DHCPv6 spoofers** for MITM attacks on IPv4 and IPv6 based networks.
-* **Proxies at packet level, TCP level and HTTP/HTTPS** application level fully scriptable with easy to implement **javascript plugins**.
-* A powerful **network sniffer** for **credentials harvesting** which can also be used as a **network protocol fuzzer**.
-* A very fast port scanner.
-* A powerful [REST API](https://www.bettercap.org/modules/core/api.rest/) with support for asynchronous events notification on websocket to orchestrate your attacks easily.
-* **A very convenient [web UI](https://www.bettercap.org/usage/#web-ui).**
-* [More!](https://www.bettercap.org/modules/)
+## Future feature
+* Selectable exfiltrations server.  
+* Exfiltrations implemented in bettercap command line interfaces.  
+* S7comm dissector implementations. 
+* DNS exfiltrations.  
+
+---
+## Test
+
+you can test the feature by
+
+```sh
+# on one terminal. 
+# need to install scapy.
+python sample/run_pcap_sample.py -f /bettercap/sample/modbus_packet/MODBUS_SAMPLE_FUNCTION_CODE.pcap 
+
+# on a onther terminal.
+go run main.go -script script/run_probe_sniff_on.js
+```
+
+If you whant to test the exfiltrations: 
+
+```sh
+# change the SrcIP and the DstIP inside the "exil_icmp_echo" functions on the "net_sniff_modbus_tcp.go" file
+# on a other machine. 
+# the file is located inside the /module/exfiltration path
+python server_icmp_echo8.py -eth IFACE_NAME
+```
+
+Some output example.
+
+
+![](picture/bettercap_example_modbus.gif)
+
+
+
+Exemple of exfiltrations 
+
+![](picture/exemple_exfiltrations.png)
 
 ## License
 
-`bettercap` is made with ♥  by [the dev team](https://github.com/orgs/bettercap/people) and it's released under the GPL 3 license.
+`bettercap_ICS` is made with ♥  by me and take the work of [the dev team](https://github.com/orgs/bettercap/people), it's released under the GPL 3 license.
 
-## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/bettercap/bettercap.svg)](https://starchart.cc/bettercap/bettercap)

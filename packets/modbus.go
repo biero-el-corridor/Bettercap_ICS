@@ -68,6 +68,8 @@ type Modbus_FUNCTIONS_CODE_1_OR_2_reply struct {
 	DATA          map[uint16]byte `json:"WORD_COUNT"`
 }
 
+
+
 // //////////////////////
 // Funtions code 3 & 4
 type Modbus_FUNCTIONS_CODE_3_OR_4_query struct {

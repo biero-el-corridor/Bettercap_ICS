@@ -1,0 +1,15 @@
+[
+    {
+        "PLC": {
+            "PLC_INFO": {
+                "QUERY_DST_MAC": "",
+                "QUERY_IP_DST": ""
+            },
+            "Query_Responce": {
+                "QUERY": {
+                },
+                "REPLY": {
+            }
+        }
+    }
+]

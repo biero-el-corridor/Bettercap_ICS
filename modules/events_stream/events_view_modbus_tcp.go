@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/biero-el-corridor/Bettercap_ICS/session"
-	//"github.com/biero-el-corridor/Bettercap_ICS/packets"
 )
 
 ///////////////////////////////////////////////////

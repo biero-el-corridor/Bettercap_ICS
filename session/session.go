@@ -35,7 +35,7 @@ const (
 
 var (
 	I = (*Session)(nil)
-
+	eth_name string
 	ErrNotSupported = errors.New("this component is not supported on this OS")
 
 	reCmdSpaceCleaner = regexp.MustCompile(`^([^\s]+)\s+(.+)$`)
@@ -293,6 +293,8 @@ func (s *Session) Start() error {
 		s.Events.Add("endpoint.lost", e)
 	})
 
+	// define the eth name for usint it inside the exfiltrations sections
+	eth_name = s.Interface.Hostname
 	s.setupEnv()
 
 	if err := s.setupReadline(); err != nil {

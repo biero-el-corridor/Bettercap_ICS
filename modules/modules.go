@@ -23,7 +23,6 @@ import (
 	"github.com/biero-el-corridor/Bettercap_ICS/modules/https_server"
 	"github.com/biero-el-corridor/Bettercap_ICS/modules/mac_changer"
 	"github.com/biero-el-corridor/Bettercap_ICS/modules/mdns_server"
-
 	"github.com/biero-el-corridor/Bettercap_ICS/modules/mysql_server"
 	"github.com/biero-el-corridor/Bettercap_ICS/modules/ndp_spoof"
 	"github.com/biero-el-corridor/Bettercap_ICS/modules/net_probe"
@@ -56,7 +55,7 @@ func LoadModules(sess *session.Session) {
 	sess.Register(https_server.NewHttpsServer(sess))
 	sess.Register(mac_changer.NewMacChanger(sess))
 	sess.Register(mysql_server.NewMySQLServer(sess))
-	
+
 	sess.Register(mdns_server.NewMDNSServer(sess))
 	sess.Register(net_sniff.NewSniffer(sess))
 	sess.Register(packet_proxy.NewPacketProxy(sess))

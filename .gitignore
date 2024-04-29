@@ -14,4 +14,3 @@ stage/
 
 /snap
 .idea
-modules/net_sniff/net_sniff_modbus_tcp.go

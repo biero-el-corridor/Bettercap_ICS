@@ -11,6 +11,7 @@ import (
 	"github.com/biero-el-corridor/Bettercap_ICS/core"
 	"github.com/biero-el-corridor/Bettercap_ICS/log"
 	"github.com/biero-el-corridor/Bettercap_ICS/modules"
+
 	"github.com/biero-el-corridor/Bettercap_ICS/session"
 
 	"github.com/evilsocket/islazy/str"
@@ -99,6 +100,7 @@ func main() {
 }
 
 func exitPrompt() bool {
+
 	var ans string
 	fmt.Printf("Are you sure you want to quit this session? y/n ")
 	fmt.Scan(&ans)
